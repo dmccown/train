@@ -7,10 +7,10 @@ Gem::Specification.new do |spec|
   spec.name          = 'train'
   spec.version       = Train::VERSION
   spec.authors       = ['Dominik Richter']
-  spec.email         = ['dominik.richter@gmail.com']
+  spec.email         = ['drichter@chef.io']
   spec.summary       = 'Transport interface to talk to different backends.'
   spec.description   = 'Transport interface to talk to different backends.'
-  spec.homepage      = 'https://github.com/chef/train/'
+  spec.homepage      = 'https://github.com/inspec/train/'
   spec.license       = 'Apache-2.0'
 
   spec.files = %w{
@@ -34,6 +34,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'winrm-fs', '~> 1.0'
   spec.add_dependency 'docker-api', '~> 1.26'
   spec.add_dependency 'aws-sdk', '~> 2'
+  spec.add_dependency 'azure_mgmt_resources', '~> 0.15'
+  spec.add_dependency 'google-api-client', '~> 0.19.8'
+  spec.add_dependency 'googleauth', '~> 0.6.2'
+  spec.add_dependency 'google-cloud', '~> 0.51.1'
+  spec.add_dependency 'inifile'
 
   spec.add_development_dependency 'mocha', '~> 1.1'
 end

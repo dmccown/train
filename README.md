@@ -1,7 +1,7 @@
 # Train - Transport Interface
 
-[![Build Status](https://travis-ci.org/chef/train.svg?branch=master)](https://travis-ci.org/chef/train)
-[![Build Status Master](https://ci.appveyor.com/api/projects/status/github/chef/train?branch=master&svg=true&passingText=master%20-%20Ok&pendingText=master%20-%20Pending&failingText=master%20-%20Failing)](https://ci.appveyor.com/project/Chef/train/branch/master)
+[![Build Status](https://travis-ci.org/inspec/train.svg?branch=master)](https://travis-ci.org/inspec/train)
+[![Build Status Master](https://ci.appveyor.com/api/projects/status/github/inspec/train?branch=master&svg=true&passingText=master%20-%20Ok&pendingText=master%20-%20Pending&failingText=master%20-%20Failing)](https://ci.appveyor.com/project/Chef/train/branch/master)
 [![Gem Version](https://badge.fury.io/rb/train.svg)](https://badge.fury.io/rb/train)
 
 Train lets you talk to your local or remote operating systems and APIs with a unified interface.
@@ -21,6 +21,8 @@ Train supports:
 * Docker
 * Mock (for testing and debugging)
 * AWS as an API
+* Azure as an API
+* VMware via PowerCLI
 
 # Examples
 
@@ -76,6 +78,20 @@ You may also use the standard AWS CLI environment variables, `AWS_ACCESS_KEY_ID`
 ```ruby
 require 'train'
 train = Train.create('aws')
+```
+
+**VMware**
+
+```ruby
+require 'train'
+Train.create('vmware', viserver: '10.0.0.10', user: 'demouser', password: 'securepassword')
+```
+
+You may also use environment variables by setting `VISERVER`, `VISERVER__USERNAME`, and `VISERVER_PASSWORD`
+
+```ruby
+require 'train'
+Train.create('vmware')
 ```
 
 ## Configuration
@@ -150,7 +166,7 @@ bundle exec ruby -I .\test\windows\ .\test\windows\local_test.rb
 
 Train is heavily based on the work of:
 
-* [test-kitchen](https://github.com/test-kitchen/test-kitchen)  
+* [test-kitchen](https://github.com/test-kitchen/test-kitchen)
 
     by [Fletcher Nichol](fnichol@nichol.ca)
     and [a great community of contributors](https://github.com/test-kitchen/test-kitchen/graphs/contributors)
@@ -177,7 +193,7 @@ We also want to thank [halo](https://github.com/halo) who did a great contributi
 
 | **Author:**          | Christoph Hartmann (<chartmann@chef.io>)
 
-| **Copyright:**       | Copyright (c) 2015 Chef Software Inc.
+| **Copyright:**       | Copyright (c) 2015-2018 Chef Software Inc.
 
 | **Copyright:**       | Copyright (c) 2015 Vulcano Security GmbH.
 

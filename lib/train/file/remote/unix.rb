@@ -33,7 +33,7 @@ module Train
 
         def mounted
           @mounted ||=
-            @backend.run_command("mount | grep -- ' on #{@spath} '")
+            @backend.run_command("mount | grep -- ' on #{@path} '")
         end
 
         %w{
@@ -58,6 +58,11 @@ module Train
 
         def link_path
           symlink? ? path : nil
+        end
+
+        def shallow_link_path
+          return nil unless symlink?
+          @shallow_link_path ||= ::File.readlink(@path)
         end
 
         def unix_mode_mask(owner, type)

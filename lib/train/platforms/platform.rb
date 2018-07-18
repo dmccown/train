@@ -22,6 +22,10 @@ module Train::Platforms
       @families.collect { |k, _v| k.name }
     end
 
+    def family
+      @platform[:family] || @family_hierarchy[0]
+    end
+
     def name
       # Override here incase a updated name was set
       # during the detect logic
@@ -35,6 +39,10 @@ module Train::Platforms
                           name.downcase!.tr!(' ', '_') if name =~ /[A-Z ]/
                           name
                         end
+    end
+
+    def uuid
+      @uuid ||= Train::Platforms::Detect::UUID.new(self).find_or_create_uuid.downcase
     end
 
     # This is for backwords compatability with

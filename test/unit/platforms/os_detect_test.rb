@@ -54,6 +54,16 @@ describe 'os_detect' do
         platform[:family].must_equal('redhat')
         platform[:release].must_equal('7.4')
       end
+      it 'sets the correct family, name, and release on CloudLinux' do
+        files = {
+          '/etc/redhat-release' => "CloudLinux release 7.4 (Georgy Grechko)\n",
+          '/etc/os-release' => "NAME=\"CloudLinux\"\nVERSION=\"7.4 (Georgy Grechko)\"\nID=\"cloudlinux\"\nID_LIKE=\"rhel fedora centos\"\nVERSION_ID=\"7.4\"\nPRETTY_NAME=\"CloudLinux 7.4 (Georgy Grechko)\"\nANSI_COLOR=\"0;31\"\nCPE_NAME=\"cpe:/o:cloudlinux:cloudlinux:7.4:GA:server\"\nHOME_URL=\"https://www.cloudlinux.com//\"\nBUG_REPORT_URL=\"https://www.cloudlinux.com/support\"\n",
+        }
+        platform = scan_with_files('linux', files)
+        platform[:name].must_equal('cloudlinux')
+        platform[:family].must_equal('redhat')
+        platform[:release].must_equal('7.4')
+      end
     end
   end
 
@@ -183,6 +193,16 @@ describe 'os_detect' do
     end
   end
 
+  describe 'qnx' do
+    it 'sets the correct info for qnx platform' do
+      platform = scan_with_files('qnx', {})
+
+      platform[:name].must_equal('qnx')
+      platform[:family].must_equal('qnx')
+      platform[:release].must_equal('test-release')
+    end
+  end
+
   describe 'cisco' do
     it 'recognizes Cisco IOS12' do
       mock = Train::Transports::Mock::Connection.new
@@ -194,6 +214,16 @@ describe 'os_detect' do
       platform[:release].must_equal('12.2')
     end
 
+    it 'recognizes Cisco IOS XE' do
+      mock = Train::Transports::Mock::Connection.new
+      mock.mock_command('show version', "Cisco IOS Software, IOS-XE Software, Catalyst L3 Switch Software (CAT3K_CAA-UNIVERSALK9-M), Version 03.03.03SE RELEASE SOFTWARE (fc2)")
+      platform = Train::Platforms::Detect.scan(mock)
+
+      platform[:name].must_equal('cisco_ios_xe')
+      platform[:family].must_equal('cisco')
+      platform[:release].must_equal('03.03.03SE')
+    end
+
     it 'recognizes Cisco Nexus' do
       mock = Train::Transports::Mock::Connection.new
       mock.mock_command('show version', "Cisco Nexus Operating System (NX-OS) Software\n  system:      version 5.2(1)N1(8b)\n")
@@ -202,6 +232,18 @@ describe 'os_detect' do
       platform[:name].must_equal('cisco_nexus')
       platform[:family].must_equal('cisco')
       platform[:release].must_equal('5.2')
+    end
+  end
+
+  describe 'brocade' do
+    it 'recognizes Brocade FOS-based SAN switches' do
+      mock = Train::Transports::Mock::Connection.new
+      mock.mock_command('version', "Kernel:     2.6.14.2\nFabric OS:  v7.4.2a\nMade on:    Thu Jun 29 19:22:14 2017\nFlash:      Sat Sep 9 17:30:42 2017\nBootProm:   1.0.11")
+      platform = Train::Platforms::Detect.scan(mock)
+
+      platform[:name].must_equal('brocade_fos')
+      platform[:family].must_equal('brocade')
+      platform[:release].must_equal('7.4.2a')
     end
   end
 end

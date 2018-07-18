@@ -37,6 +37,7 @@ module Train::Transports
     name 'ssh'
 
     require 'train/transports/ssh_connection'
+    require 'train/transports/cisco_ios_connection'
 
     # add options for submodules
     include_options Train::Extras::CommandWrapper
@@ -57,6 +58,10 @@ module Train::Transports
     option :max_wait_until_ready, default: 600
     option :compression, default: false
     option :pty, default: false
+    option :proxy_command, default: nil
+    option :bastion_host, default: nil
+    option :bastion_user, default: 'root'
+    option :bastion_port, default: 22
 
     option :compression_level do |opts|
       # on nil or false: set compression level to 0
@@ -108,6 +113,10 @@ module Train::Transports
         logger.warn('[SSH] PTY requested: stderr will be merged into stdout')
       end
 
+      if [options[:proxy_command], options[:bastion_host]].all? { |type| !type.nil? }
+        fail Train::ClientError, 'Only one of proxy_command or bastion_host needs to be specified'
+      end
+
       super
       self
     end
@@ -149,6 +158,10 @@ module Train::Transports
         keys:                   opts[:key_files],
         password:               opts[:password],
         forward_agent:          opts[:forward_agent],
+        proxy_command:          opts[:proxy_command],
+        bastion_host:           opts[:bastion_host],
+        bastion_user:           opts[:bastion_user],
+        bastion_port:           opts[:bastion_port],
         transport_options:      opts,
       }
 
@@ -192,6 +205,22 @@ module Train::Transports
 
       @connection_options = options
       conn = Connection.new(options, &block)
+
+      # Cisco IOS requires a special implementation of `Net:SSH`. This uses the
+      # SSH transport to identify the platform, but then replaces SSHConnection
+      # with a CiscoIOSConnection in order to behave as expected for the user.
+      if defined?(conn.platform.cisco_ios?) && conn.platform.cisco_ios?
+        ios_options = {}
+        ios_options[:host] = @options[:host]
+        ios_options[:user] = @options[:user]
+        # The enable password is used to elevate privileges on Cisco devices
+        # We will also support the sudo password field for the same purpose
+        # for the interim. # TODO
+        ios_options[:enable_password] = @options[:enable_password] || @options[:sudo_password]
+        ios_options.merge!(@connection_options)
+        conn = CiscoIOSConnection.new(ios_options)
+      end
+
       @connection = conn unless conn.nil?
     end
 

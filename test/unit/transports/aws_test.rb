@@ -96,4 +96,25 @@ describe 'aws transport' do
       ENV['AWS_REGION'].must_equal 'xyz'
     end
   end
+
+  describe 'unique_identifier' do
+
+    class AwsCallerId
+      def account
+        "123456789012"
+      end
+    end
+
+    class StsClient
+      def get_caller_identity
+        AwsCallerId.new
+      end
+    end
+
+    it 'returns an account id' do
+      connection.stubs(:aws_client).returns(StsClient.new)
+      connection.unique_identifier.must_equal '123456789012'
+    end
+  end
+
 end

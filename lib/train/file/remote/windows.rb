@@ -39,7 +39,7 @@ module Train
         end
 
         def type
-          if attributes.include?('Archive')
+          if attributes.include?('Archive') && !attributes.include?('Directory')
             return :file
           elsif attributes.include?('ReparsePoint')
             return :symlink
@@ -74,6 +74,10 @@ module Train
         end
 
         def link_path
+          nil
+        end
+
+        def shallow_link_path
           nil
         end
 
